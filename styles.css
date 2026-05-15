@@ -2253,6 +2253,12 @@
   width: max-content;
 }
 
+.carousel-track.active-drag {
+  cursor: grabbing;
+  cursor: -webkit-grabbing;
+  user-select: none;
+}
+
 .testimonial-card {
   flex-shrink: 0;
   width: 380px; /* Fixed width for cards */

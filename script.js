@@ -158,13 +158,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (menuToggle && navList) {
     menuToggle.addEventListener("click", () => {
-      const open = navList.classList.toggle("open");
+      const open = navList.classList.toggle("show");
       menuToggle.setAttribute("aria-expanded", open);
     });
 
     navList.querySelectorAll(".nav-link").forEach(link => {
       link.addEventListener("click", () => {
-        navList.classList.remove("open");
+        navList.classList.remove("show");
         menuToggle.setAttribute("aria-expanded", "false");
       });
     });
@@ -182,6 +182,16 @@ document.addEventListener("DOMContentLoaded", () => {
     toggle.addEventListener("click", (e) => {
       e.preventDefault();
       menu.classList.toggle("show");
+    });
+
+    // Smooth scroll for dropdown anchor links and close menu
+    menu.querySelectorAll("a[href^='#']").forEach(link => {
+      link.addEventListener("click", (e) => {
+        e.preventDefault();
+        menu.classList.remove("show");
+        const target = document.querySelector(link.getAttribute("href"));
+        if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
     });
 
     document.addEventListener("click", (e) => {
@@ -385,9 +395,74 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 
+  // Smooth scroll for all plain nav anchor links (e.g. About Us)
+  document.querySelectorAll(".nav-list a[href^='#']").forEach(link => {
+    if (link.classList.contains("dropdown-toggle")) return; // skip dropdown toggles
+    link.addEventListener("click", (e) => {
+      const target = document.querySelector(link.getAttribute("href"));
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    });
+  });
+
+
   /* =========================================================
-     15. SCROLL REVEAL — fade-in for cards / rows
+     15. MISSING BUTTON HANDLERS
   ========================================================= */
+
+  // Helper: smooth-scroll to a section
+  function scrollTo(selector) {
+    const el = document.querySelector(selector);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  // "Download Full Technical Datasheet" button
+  const downloadButton = document.querySelector(".download-button");
+  if (downloadButton) {
+    downloadButton.addEventListener("click", () => {
+      alert("Downloading: HDPE-Technical-Datasheet.pdf\n\n(In production this would download the real file.)");
+    });
+  }
+
+  // "Contact Us" nav button → scroll to contact/transform section
+  const contactButton = document.querySelector(".contact-button");
+  if (contactButton) {
+    contactButton.addEventListener("click", () => scrollTo(".transform-section"));
+  }
+
+  // "Get Custom Quote" primary button → scroll to contact form
+  const primaryButton = document.querySelector(".primary-button");
+  if (primaryButton) {
+    primaryButton.addEventListener("click", () => scrollTo(".transform-section"));
+  }
+
+  // "View Technical Specs" secondary button → scroll to specs section
+  const secondaryButton = document.querySelector(".secondary-button");
+  if (secondaryButton) {
+    secondaryButton.addEventListener("click", () => scrollTo(".technical-specs-section"));
+  }
+
+  // "Request a Quote" button (features section) → scroll to contact form
+  const quoteButton = document.querySelector(".quote-button");
+  if (quoteButton) {
+    quoteButton.addEventListener("click", () => scrollTo(".transform-section"));
+  }
+
+  // Download buttons — trigger a simulated download or show a message
+  document.querySelectorAll(".download-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const file = btn.getAttribute("data-file");
+      if (file) {
+        alert(`Downloading: ${file}\n\n(In production this would download the real file.)`);
+      }
+    });
+  });
+
+  // =========================================================
+  // 16. SCROLL REVEAL — fade-in for cards / rows
+  // ========================================================= */
   if ("IntersectionObserver" in window) {
     const revealTargets = document.querySelectorAll(
       ".feature-card, .testimonial-card, .portfolio-card, .faq-item, .application-card, .specs-row"
@@ -410,6 +485,9 @@ document.addEventListener("DOMContentLoaded", () => {
       observer.observe(el);
     });
   }
+
+  // Manufacturing carousel init
+  window.manufacturingCarousel = new ManufacturingCarousel();
 
 }); // end DOMContentLoaded
 
@@ -540,10 +618,6 @@ class ManufacturingCarousel {
     nextBtn.style.opacity = nextBtn.disabled ? "0.5" : "1";
   }
 }
-
-document.addEventListener("DOMContentLoaded", () => {
-  window.manufacturingCarousel = new ManufacturingCarousel();
-});
 
 document.addEventListener("contextmenu", e => {
   if (e.target.closest(".carousel-card")) e.preventDefault();
